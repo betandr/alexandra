@@ -17,6 +17,8 @@ func main() {
 
 	var c udp.Client
 	c.Connect("127.0.0.1:8067")
+	defer c.Disconnect()
+
 	response, err := c.Send(packet)
 	if err != nil {
 		log.Fatal(err)
