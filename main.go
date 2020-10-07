@@ -1,27 +1,26 @@
 package main
 
 import (
-	"fmt"
-	"os"
+	"log"
 
-	"github.com/betandr/alexandra/client"
 	"github.com/betandr/alexandra/rtp"
-	"github.com/betandr/alexandra/server"
+	"github.com/betandr/alexandra/udp"
 )
 
 func main() {
-	go server.Start()
-
-	conn, err := client.NewConnection()
-	if err != nil {
-		fmt.Printf("error getting connection: %v\n", err)
-		os.Exit(1)
-	}
+	go udp.Listen()
 
 	packet := rtp.Packet{
 		Header:  rtp.NewHeader(),
-		Payload: "Hello, World!",
+		Payload: "Hello, Server!",
 	}
 
-	client.Send(conn, packet)
+	var c udp.Client
+	c.Connect("127.0.0.1:8067")
+	response, err := c.Send(packet)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Printf("from server: %v\n", response)
 }
