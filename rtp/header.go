@@ -41,7 +41,6 @@ package rtp
 // SynchronizationSource contains next 4 octets
 // - SSRC: 32 bits - Identifies the synchronization source.
 //
-//
 // - CSRC list: 0 to 15 items, 32 bits each - Identifies the contributing
 // sources for the payload contained in this packet.
 type Header interface{}
