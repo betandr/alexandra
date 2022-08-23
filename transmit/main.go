@@ -14,12 +14,12 @@ func main() {
 	}
 	defer conn.Close()
 
-	p := make([]byte, 2048)
+	buf := make([]byte, 2048)
 	fmt.Fprintf(conn, "Hello, UDP!")
 
-	_, err = bufio.NewReader(conn).Read(p)
+	_, err = bufio.NewReader(conn).Read(buf)
 	if err == nil {
-		fmt.Printf("%s\n", p)
+		fmt.Printf("message from %s: %s \n", conn.RemoteAddr(), buf)
 	} else {
 		fmt.Printf("error reading: %v\n", err)
 	}
