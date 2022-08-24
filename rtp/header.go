@@ -43,9 +43,7 @@ package rtp
 //
 // - CSRC list: 0 to 15 items, 32 bits each - Identifies the contributing
 // sources for the payload contained in this packet.
-type Header interface{}
-
-type header struct {
+type Header struct {
 	Head                  uint16   // |V (2 bits)|P (1 bit)|X (1 bit)|CC (4 bits)|M (1 bit)|PT (7 bits)|
 	SequenceNumber        uint16   // |sequence number (16 bits)|
 	Timestamp             uint32   // |timestamp (32 bits)|
@@ -58,12 +56,11 @@ type header struct {
 // |10|0|0|0000|0|0000000|
 func NewHeader() Header {
 	head := uint16(32768) // 0b1000000000000000
-	return header{head, 0, 0, 0, []uint32{}}
+	return Header{head, 0, 0, 0, []uint32{}}
 }
 
 // NextHeader returns a new header with all of the header h's attributes but an
 // incremented sequence number
-func NextHeader(h Header) Header {
-	hdr := h.(header)
-	return header{hdr.Head, hdr.SequenceNumber + 1, 0, 0, []uint32{}}
+func (h *Header) NextHeader() Header {
+	return Header{h.Head, h.SequenceNumber + 1, 0, 0, []uint32{}}
 }

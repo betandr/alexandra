@@ -1,8 +1,11 @@
 package main
 
 import (
+	"encoding/gob"
 	"fmt"
+	"log"
 	"net"
+	"rtp"
 )
 
 func main() {
@@ -10,27 +13,21 @@ func main() {
 		Port: 8067,
 		IP:   net.ParseIP("127.0.0.1"),
 	}
-	ser, err := net.ListenUDP("udp", &addr)
+	conn, err := net.ListenUDP("udp", &addr)
 	if err != nil {
 		fmt.Printf("error listening: %s", err)
 		return
 	}
 
-	buf := make([]byte, 2048)
-
 	fmt.Println("starting...")
 	for {
-		_, remoteaddr, err := ser.ReadFromUDP(buf)
-		fmt.Printf("message from %s: %s \n", remoteaddr, buf)
+		var p rtp.Packet
+		dec := gob.NewDecoder(conn)
+		err := dec.Decode(&p)
 		if err != nil {
-			fmt.Printf("error reading: %v", err)
-			continue
+			log.Println("decoding: ", err)
 		}
 
-		_, err = ser.WriteToUDP([]byte("Hello, Client!"), remoteaddr)
-		if err != nil {
-			fmt.Printf("error sending response: %v", err)
-		}
+		fmt.Printf("packet payload recieved: %s \n", string(p.Payload))
 	}
-	fmt.Println("done...")
 }

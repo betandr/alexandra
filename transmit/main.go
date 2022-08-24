@@ -1,9 +1,11 @@
 package main
 
 import (
-	"bufio"
+	"encoding/gob"
 	"fmt"
+	"log"
 	"net"
+	"rtp"
 )
 
 func main() {
@@ -14,13 +16,15 @@ func main() {
 	}
 	defer conn.Close()
 
-	buf := make([]byte, 2048)
-	fmt.Fprintf(conn, "Hello, UDP!")
+	packet := rtp.Packet{
+		Header:  rtp.NewHeader(),
+		Payload: []byte("Hello, UDP!"),
+	}
 
-	_, err = bufio.NewReader(conn).Read(buf)
-	if err == nil {
-		fmt.Printf("message from %s: %s \n", conn.RemoteAddr(), buf)
-	} else {
-		fmt.Printf("error reading: %v\n", err)
+	gob.Register(rtp.Header{})
+	enc := gob.NewEncoder(conn)
+	err = enc.Encode(packet)
+	if err != nil {
+		log.Fatal("encode: ", err)
 	}
 }
